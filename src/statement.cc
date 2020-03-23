@@ -269,6 +269,8 @@ bool Statement::Bind(const Parameters & parameters) {
             }
             else {
                 pos = sqlite3_bind_parameter_index(_handle, field->name.c_str());
+                if (pos == 0)
+                	continue;
             }
 
             switch (field->type) {
