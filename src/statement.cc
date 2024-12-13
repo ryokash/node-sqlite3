@@ -242,7 +242,7 @@ template <class T> T* Statement::Bind(const Napi::CallbackInfo& info, int start,
                 baton->parameters.emplace_back(BindParameter((array).Get(i), i + 1));
             }
         }
-        else if (!info[start].IsObject() || OtherInstanceOf(info[start].As<Object>(), "RegExp") 
+        else if (!info[start].IsObject() || OtherInstanceOf(info[start].As<Object>(), "RegExp")
                 || OtherInstanceOf(info[start].As<Object>(), "Date") || info[start].IsBuffer()) {
             // Parameters directly in array.
             // Note: bind parameters start with 1.
@@ -294,6 +294,8 @@ bool Statement::Bind(const Parameters & parameters) {
         }
         else {
             pos = sqlite3_bind_parameter_index(_handle, field->name.c_str());
+            if (pos == 0)
+                continue;
         }
 
         switch (field->type) {
@@ -804,11 +806,11 @@ Napi::Value Statement::RowToJS(Napi::Env env, Row* row) {
                 value = Napi::Number::New(env, (static_cast<Values::Float*>(field.get()))->value);
             } break;
             case SQLITE_TEXT: {
-                value = Napi::String::New(env, (static_cast<Values::Text*>(field.get()))->value.c_str(), 
+                value = Napi::String::New(env, (static_cast<Values::Text*>(field.get()))->value.c_str(),
                                                (static_cast<Values::Text*>(field.get()))->value.size());
             } break;
             case SQLITE_BLOB: {
-                value = Napi::Buffer<char>::Copy(env, (static_cast<Values::Blob*>(field.get()))->value, 
+                value = Napi::Buffer<char>::Copy(env, (static_cast<Values::Blob*>(field.get()))->value,
                                                       (static_cast<Values::Blob*>(field.get()))->length);
             } break;
             case SQLITE_NULL: {
